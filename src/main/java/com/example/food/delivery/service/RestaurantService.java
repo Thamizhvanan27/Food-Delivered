@@ -88,4 +88,57 @@ public class RestaurantService {
     public void deleteRestaurant(Long id) {
         restaurantRepository.deleteById(id);
     }
+
+    public List<Restaurant> getRestaurantsByOwner(com.example.food.delivery.entity.User owner) {
+        return restaurantRepository.findByOwner(owner);
+    }
+
+    public Restaurant getRestaurantByIdAndOwner(Long id, com.example.food.delivery.entity.User owner) {
+        return restaurantRepository.findByIdAndOwner(id, owner)
+                .orElseThrow(() -> new org.springframework.security.access.AccessDeniedException("Access denied or restaurant not found for this owner."));
+    }
+
+    @Transactional
+    public Restaurant saveOwnerRestaurant(com.example.food.delivery.dto.OwnerRestaurantDto dto, com.example.food.delivery.entity.User owner) {
+        Restaurant restaurant;
+        if (dto.getId() != null) {
+            restaurant = getRestaurantByIdAndOwner(dto.getId(), owner);
+        } else {
+            restaurant = new Restaurant();
+            restaurant.setOwner(owner);
+        }
+
+        restaurant.setName(dto.getName());
+        restaurant.setDescription(dto.getDescription());
+        restaurant.setCuisine(dto.getCuisine());
+        restaurant.setPhone(dto.getPhone());
+        restaurant.setEmail(dto.getEmail());
+        restaurant.setAddress(dto.getAddress());
+        restaurant.setCity(dto.getCity());
+        restaurant.setState(dto.getState());
+        restaurant.setPincode(dto.getPincode());
+        restaurant.setLandmark(dto.getLandmark());
+        restaurant.setPriceRange(dto.getPriceRange());
+        if (dto.getDeliveryTimeMinutes() != null) restaurant.setDeliveryTimeMinutes(dto.getDeliveryTimeMinutes());
+        if (dto.getImageUrl() != null && !dto.getImageUrl().trim().isEmpty()) restaurant.setImageUrl(dto.getImageUrl());
+        restaurant.setOpeningTime(dto.getOpeningTime());
+        restaurant.setClosingTime(dto.getClosingTime());
+        if (dto.getOperationalStatus() != null) restaurant.setOperationalStatus(dto.getOperationalStatus());
+        if (dto.getManualClosed() != null) restaurant.setManualClosed(dto.getManualClosed());
+
+        return restaurantRepository.save(restaurant);
+    }
+
+    @Transactional
+    public void toggleOperationalStatus(Long id, com.example.food.delivery.entity.User owner) {
+        Restaurant restaurant = getRestaurantByIdAndOwner(id, owner);
+        if (restaurant.getOperationalStatus() == Restaurant.OperationalStatus.OPEN) {
+            restaurant.setOperationalStatus(Restaurant.OperationalStatus.CLOSED);
+            restaurant.setManualClosed(true);
+        } else {
+            restaurant.setOperationalStatus(Restaurant.OperationalStatus.OPEN);
+            restaurant.setManualClosed(false);
+        }
+        restaurantRepository.save(restaurant);
+    }
 }

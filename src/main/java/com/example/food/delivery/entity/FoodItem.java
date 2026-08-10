@@ -43,6 +43,10 @@ public class FoodItem {
 
     private boolean isVegetarian;
 
+    private Integer prepTimeMinutes;
+
+    private String specialInstructions;
+
     @Builder.Default
     private boolean available = true;
 }

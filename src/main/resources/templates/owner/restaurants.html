@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Restaurants | Partner Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="bg-light">
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div th:replace="~{fragments/owner-sidebar :: owner-sidebar('restaurants')}"></div>
+
+        <!-- Main Content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-3 mb-4 border-bottom">
+                <div>
+                    <h2 class="h3 fw-bold mb-0">My Restaurants 🏪</h2>
+                    <p class="text-muted mb-0 fs-sm">Manage your restaurant details, opening hours, and live operational status.</p>
+                </div>
+                <a th:href="@{/owner/restaurants/new}" class="btn btn-purple rounded-pill px-4 fw-semibold shadow-sm">
+                    <i class="bi bi-plus-lg me-1"></i> Register New Restaurant
+                </a>
+            </div>
+
+            <!-- Alerts -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show rounded-3 mb-4" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i><span th:text="${success}">Success message</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show rounded-3 mb-4" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${error}">Error message</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Restaurant Cards List -->
+            <div th:if="${#lists.isEmpty(restaurants)}" class="text-center py-5 bg-white rounded-4 shadow-sm">
+                <i class="bi bi-building-add fs-1 text-muted d-block mb-3"></i>
+                <h4 class="fw-bold">No Restaurants Registered Yet</h4>
+                <p class="text-muted max-w-md mx-auto">Click the button below to register your restaurant and start publishing your menu online.</p>
+                <a th:href="@{/owner/restaurants/new}" class="btn btn-purple rounded-pill px-4">Register Restaurant</a>
+            </div>
+
+            <div class="row g-4" th:unless="${#lists.isEmpty(restaurants)}">
+                <div th:each="r : ${restaurants}" class="col-md-6 col-xl-4">
+                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 position-relative">
+                        
+                        <div class="position-relative">
+                            <img th:src="${r.imageUrl != null ? r.imageUrl : 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600'}" 
+                                 class="card-img-top object-fit-cover" height="200" alt="Restaurant Image">
+                            
+                            <span th:if="${r.isCurrentlyOpen()}" class="position-absolute top-0 end-0 m-3 badge bg-success fs-6 rounded-pill shadow-sm">
+                                <i class="bi bi-door-open-fill me-1"></i> OPEN
+                            </span>
+                            <span th:unless="${r.isCurrentlyOpen()}" class="position-absolute top-0 end-0 m-3 badge bg-danger fs-6 rounded-pill shadow-sm">
+                                <i class="bi bi-door-closed-fill me-1"></i> CLOSED
+                            </span>
+                        </div>
+
+                        <div class="card-body p-4 d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="card-title fw-bold mb-0 text-truncate" th:text="${r.name}">Restaurant Name</h5>
+                                <span class="badge bg-warning text-dark rounded-pill fw-bold"><i class="bi bi-star-fill me-1"></i>[[${r.rating}]]</span>
+                            </div>
+
+                            <p class="text-muted fs-sm mb-3 text-truncate-2" th:text="${r.description}">Description...</p>
+
+                            <div class="bg-light p-3 rounded-3 mb-3 fs-xs text-secondary">
+                                <div class="mb-1"><i class="bi bi-tag-fill text-purple me-2"></i><span class="fw-semibold text-dark" th:text="${r.cuisine}">Cuisine</span></div>
+                                <div class="mb-1"><i class="bi bi-geo-alt-fill text-purple me-2"></i><span th:text="${r.address + ', ' + r.city}">Location</span></div>
+                                <div><i class="bi bi-clock-fill text-purple me-2"></i><span th:text="${(r.openingTime != null ? r.openingTime : '09:00') + ' - ' + (r.closingTime != null ? r.closingTime : '22:00')}">Hours</span></div>
+                            </div>
+
+                            <div class="mt-auto d-flex flex-column gap-2">
+                                <form th:action="@{/owner/restaurants/toggle-status/{id}(id=${r.id})}" method="post">
+                                    <button type="submit" th:classappend="${r.isCurrentlyOpen()} ? 'btn-outline-danger' : 'btn-outline-success'" class="btn btn-sm w-100 rounded-pill fw-bold">
+                                        <i th:classappend="${r.isCurrentlyOpen()} ? 'bi-door-closed-fill' : 'bi-door-open-fill'" class="bi me-1"></i>
+                                        <span th:text="${r.isCurrentlyOpen()} ? 'Close Restaurant' : 'Open Restaurant'">Toggle</span>
+                                    </button>
+                                </form>
+
+                                <div class="d-flex gap-2">
+                                    <a th:href="@{/owner/menu(restaurantId=${r.id})}" class="btn btn-sm btn-purple flex-grow-1 rounded-pill fw-semibold">
+                                        <i class="bi bi-journals me-1"></i> Manage Menu
+                                    </a>
+                                    <a th:href="@{/owner/restaurants/edit/{id}(id=${r.id})}" class="btn btn-sm btn-light border flex-grow-1 rounded-pill">
+                                        <i class="bi bi-pencil-square me-1"></i> Edit Details
+                                    </a>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

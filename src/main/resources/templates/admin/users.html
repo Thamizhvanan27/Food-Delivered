@@ -38,6 +38,7 @@
                                 <td th:text="${u.phone}">Phone</td>
                                 <td>
                                     <span th:if="${u.role == 'ROLE_ADMIN'}" class="badge bg-danger">ADMIN</span>
+                                    <span th:if="${u.role == 'ROLE_RESTAURANT_OWNER'}" class="badge bg-purple">RESTAURANT OWNER</span>
                                     <span th:if="${u.role == 'ROLE_CUSTOMER'}" class="badge bg-primary">CUSTOMER</span>
                                 </td>
                                 <td class="small text-muted" th:text="${u.createdAt != null ? #temporals.format(u.createdAt, 'dd MMM yyyy') : '-'}">Date</td>

@@ -155,4 +155,55 @@ public class OrderService {
                 .cancelledOrders(cancelledOrders)
                 .build();
     }
+
+    public List<Order> getOrdersByOwner(User owner) {
+        return orderRepository.findByRestaurantOwnerOrderByCreatedAtDesc(owner);
+    }
+
+    public Order getOrderByIdAndOwner(Long id, User owner) {
+        return orderRepository.findByIdAndRestaurantOwner(id, owner)
+                .orElseThrow(() -> new org.springframework.security.access.AccessDeniedException("Access denied or order not found for this restaurant owner."));
+    }
+
+    public List<Order> getOrdersByOwnerAndStatus(User owner, Order.OrderStatus status) {
+        return orderRepository.findByRestaurantOwnerAndOrderStatusOrderByCreatedAtDesc(owner, status);
+    }
+
+    @Transactional
+    public void updateOrderStatusByOwner(Long id, Order.OrderStatus status, User owner) {
+        Order order = getOrderByIdAndOwner(id, owner);
+        order.setOrderStatus(status);
+        if (status == Order.OrderStatus.DELIVERED && order.getPaymentMethod() == Order.PaymentMethod.CASH_ON_DELIVERY) {
+            order.setPaymentStatus(Order.PaymentStatus.PAID);
+        }
+        orderRepository.save(order);
+    }
+
+    public com.example.food.delivery.dto.OwnerDashboardStatsDto getOwnerDashboardStats(User owner) {
+        long totalRestaurants = restaurantRepository.countByOwner(owner);
+        long totalMenuItems = foodItemRepository.countByRestaurantOwner(owner);
+        long totalOrders = orderRepository.countByRestaurantOwner(owner);
+
+        LocalDateTime startOfDay = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0);
+        long todaysOrders = orderRepository.countByRestaurantOwnerAndCreatedAtAfter(owner, startOfDay);
+
+        BigDecimal todaysRevenue = orderRepository.sumGrandTotalByOwnerAndCreatedAtAfter(owner, startOfDay);
+        if (todaysRevenue == null) todaysRevenue = BigDecimal.ZERO;
+
+        long pendingOrders = orderRepository.countByRestaurantOwnerAndOrderStatus(owner, Order.OrderStatus.PLACED) +
+                orderRepository.countByRestaurantOwnerAndOrderStatus(owner, Order.OrderStatus.CONFIRMED) +
+                orderRepository.countByRestaurantOwnerAndOrderStatus(owner, Order.OrderStatus.PREPARING) +
+                orderRepository.countByRestaurantOwnerAndOrderStatus(owner, Order.OrderStatus.OUT_FOR_DELIVERY);
+
+        long completedOrders = orderRepository.countByRestaurantOwnerAndOrderStatus(owner, Order.OrderStatus.DELIVERED);
+
+        return com.example.food.delivery.dto.OwnerDashboardStatsDto.builder()
+                .totalRestaurants(totalRestaurants)
+                .totalMenuItems(totalMenuItems)
+                .todaysOrders(todaysOrders)
+                .pendingOrders(pendingOrders)
+                .completedOrders(completedOrders)
+                .todaysRevenue(todaysRevenue)
+                .build();
+    }
 }

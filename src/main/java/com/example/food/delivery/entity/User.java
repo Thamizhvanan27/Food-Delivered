@@ -38,7 +38,7 @@ public class User {
     private String phone;
 
     @Column(nullable = false)
-    private String role; // "ROLE_CUSTOMER", "ROLE_ADMIN"
+    private String role; // "ROLE_CUSTOMER", "ROLE_ADMIN", "ROLE_RESTAURANT_OWNER"
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default

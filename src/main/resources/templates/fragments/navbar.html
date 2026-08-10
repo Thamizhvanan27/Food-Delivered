@@ -45,7 +45,11 @@
                         </a>
                     </li>
 
-                    <!-- User Menu / Login -->
+                    <li class="nav-item me-2" sec:authorize="isAnonymous()">
+                        <a class="btn btn-outline-purple btn-sm rounded-pill px-3" th:href="@{/owner/register}">
+                            <i class="bi bi-shop me-1"></i>Partner Portal
+                        </a>
+                    </li>
                     <li class="nav-item" sec:authorize="isAnonymous()">
                         <a class="btn btn-outline-food me-2" th:href="@{/login}">Login</a>
                     </li>
@@ -63,9 +67,15 @@
                             <li><a class="dropdown-item" th:href="@{/profile}"><i class="bi bi-person me-2"></i>My Profile</a></li>
                             <li><a class="dropdown-item" th:href="@{/addresses}"><i class="bi bi-geo-alt me-2"></i>Saved Addresses</a></li>
                             <li><a class="dropdown-item" th:href="@{/orders}"><i class="bi bi-bag-check me-2"></i>Order History</a></li>
+                            
+                            <li sec:authorize="hasAuthority('ROLE_RESTAURANT_OWNER')"><hr class="dropdown-divider"></li>
+                            <li sec:authorize="hasAuthority('ROLE_RESTAURANT_OWNER')">
+                                <a class="dropdown-item text-purple fw-bold" th:href="@{/owner/dashboard}"><i class="bi bi-speedometer2 me-2"></i>Partner Dashboard</a>
+                            </li>
+
                             <li sec:authorize="hasAuthority('ROLE_ADMIN')"><hr class="dropdown-divider"></li>
                             <li sec:authorize="hasAuthority('ROLE_ADMIN')">
-                                <a class="dropdown-item text-danger fw-bold" th:href="@{/admin/dashboard}"><i class="bi bi-speedometer2 me-2"></i>Admin Dashboard</a>
+                                <a class="dropdown-item text-danger fw-bold" th:href="@{/admin/dashboard}"><i class="bi bi-shield-lock me-2"></i>Admin Dashboard</a>
                             </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>

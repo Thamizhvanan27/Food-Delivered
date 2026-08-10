@@ -69,4 +69,56 @@ public class FoodService {
     public void deleteFoodItem(Long id) {
         foodItemRepository.deleteById(id);
     }
+
+    public List<FoodItem> getAllFoodByRestaurant(Restaurant restaurant) {
+        return foodItemRepository.findByRestaurant(restaurant);
+    }
+
+    public List<FoodItem> getFoodItemsByOwner(com.example.food.delivery.entity.User owner) {
+        return foodItemRepository.findByRestaurantOwner(owner);
+    }
+
+    public FoodItem getFoodItemByIdAndOwner(Long id, com.example.food.delivery.entity.User owner) {
+        return foodItemRepository.findByIdAndRestaurantOwner(id, owner)
+                .orElseThrow(() -> new org.springframework.security.access.AccessDeniedException("Access denied or food item not found for this owner."));
+    }
+
+    @Transactional
+    public FoodItem saveOwnerFoodItem(com.example.food.delivery.dto.OwnerFoodItemDto dto, com.example.food.delivery.entity.User owner, Restaurant restaurant) {
+        FoodItem item;
+        if (dto.getId() != null) {
+            item = getFoodItemByIdAndOwner(dto.getId(), owner);
+        } else {
+            item = new FoodItem();
+            item.setRestaurant(restaurant);
+        }
+
+        item.setName(dto.getName());
+        item.setDescription(dto.getDescription());
+        item.setPrice(dto.getPrice());
+        item.setImageUrl(dto.getImageUrl());
+        item.setVegetarian(dto.isVegetarian());
+        item.setAvailable(dto.isAvailable());
+        item.setPrepTimeMinutes(dto.getPrepTimeMinutes());
+        item.setSpecialInstructions(dto.getSpecialInstructions());
+
+        if (dto.getCategoryId() != null) {
+            item.setCategory(getCategoryById(dto.getCategoryId()));
+        }
+
+        return foodItemRepository.save(item);
+    }
+
+    @Transactional
+    public void toggleFoodAvailabilityByOwner(Long id, com.example.food.delivery.entity.User owner) {
+        FoodItem item = getFoodItemByIdAndOwner(id, owner);
+        item.setAvailable(!item.isAvailable());
+        foodItemRepository.save(item);
+    }
+
+    @Transactional
+    public void deleteOwnerFoodItem(Long id, com.example.food.delivery.entity.User owner) {
+        FoodItem item = getFoodItemByIdAndOwner(id, owner);
+        foodItemRepository.delete(item);
+    }
 }

@@ -21,4 +21,14 @@ public interface FoodItemRepository extends JpaRepository<FoodItem, Long> {
     List<FoodItem> searchFoodItems(@Param("query") String query);
 
     List<FoodItem> findTop10ByAvailableTrueOrderByIdDesc();
+
+    List<FoodItem> findByRestaurant(Restaurant restaurant);
+
+    List<FoodItem> findByRestaurantOwner(com.example.food.delivery.entity.User owner);
+
+    List<FoodItem> findByRestaurantIdAndRestaurantOwner(Long restaurantId, com.example.food.delivery.entity.User owner);
+
+    java.util.Optional<FoodItem> findByIdAndRestaurantOwner(Long id, com.example.food.delivery.entity.User owner);
+
+    long countByRestaurantOwner(com.example.food.delivery.entity.User owner);
 }

@@ -29,6 +29,11 @@
                                     <h2 class="fw-bold mb-1" th:text="${restaurant.name}">Spice Garden</h2>
                                     <p class="text-muted mb-2" th:text="${restaurant.cuisine}">North Indian, Biryani</p>
                                     <p class="text-secondary small mb-3"><i class="bi bi-geo-alt me-1"></i><span th:text="${restaurant.address + ', ' + restaurant.city}">Address</span></p>
+                                    
+                                    <div class="mb-2">
+                                        <span th:if="${restaurant.isCurrentlyOpen()}" class="badge bg-success fs-6 rounded-pill px-3 py-1.5"><i class="bi bi-door-open-fill me-1"></i> OPEN NOW</span>
+                                        <span th:unless="${restaurant.isCurrentlyOpen()}" class="badge bg-danger fs-6 rounded-pill px-3 py-1.5"><i class="bi bi-door-closed-fill me-1"></i> CURRENTLY CLOSED</span>
+                                    </div>
                                 </div>
                                 <span class="rating-badge fs-6 px-3 py-2"><i class="bi bi-star-fill me-1"></i> <span th:text="${restaurant.rating}">4.7</span></span>
                             </div>
@@ -39,6 +44,15 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Warning Alert if Restaurant Closed -->
+            <div th:unless="${restaurant.isCurrentlyOpen()}" class="alert alert-warning rounded-4 shadow-sm mb-4 p-3 d-flex align-items-center gap-3">
+                <i class="bi bi-exclamation-triangle-fill fs-3 text-warning"></i>
+                <div>
+                    <h6 class="fw-bold mb-0">This restaurant is currently closed</h6>
+                    <small>Online ordering is temporarily paused for this restaurant. You can view the menu items below.</small>
                 </div>
             </div>
 
@@ -71,17 +85,25 @@
                                     <div class="position-relative">
                                         <img th:src="${item.imageUrl}" th:alt="${item.name}" class="img-fluid rounded-3 mb-2" style="height: 90px; width: 100%; object-fit: cover;">
                                         
-                                        <form sec:authorize="isAuthenticated()" th:action="@{/cart/add}" method="post">
-                                            <input type="hidden" name="foodItemId" th:value="${item.id}">
-                                            <input type="hidden" name="quantity" value="1">
-                                            <button type="submit" class="btn btn-primary-food btn-sm w-100">
-                                                <i class="bi bi-plus-lg me-1"></i>ADD
-                                            </button>
-                                        </form>
+                                        <div th:if="${!restaurant.isCurrentlyOpen()}">
+                                            <button class="btn btn-secondary btn-sm w-100" disabled>CLOSED</button>
+                                        </div>
+                                        <div th:if="${restaurant.isCurrentlyOpen() && !item.available}">
+                                            <button class="btn btn-secondary btn-sm w-100" disabled>UNAVAILABLE</button>
+                                        </div>
+                                        <div th:if="${restaurant.isCurrentlyOpen() && item.available}">
+                                            <form sec:authorize="isAuthenticated()" th:action="@{/cart/add}" method="post">
+                                                <input type="hidden" name="foodItemId" th:value="${item.id}">
+                                                <input type="hidden" name="quantity" value="1">
+                                                <button type="submit" class="btn btn-primary-food btn-sm w-100">
+                                                    <i class="bi bi-plus-lg me-1"></i>ADD
+                                                </button>
+                                            </form>
 
-                                        <a sec:authorize="isAnonymous()" th:href="@{/login}" class="btn btn-outline-food btn-sm w-100">
-                                            <i class="bi bi-plus-lg me-1"></i>ADD
-                                        </a>
+                                            <a sec:authorize="isAnonymous()" th:href="@{/login}" class="btn btn-outline-food btn-sm w-100">
+                                                <i class="bi bi-plus-lg me-1"></i>ADD
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

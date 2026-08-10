@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Orders | Partner Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="bg-light">
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div th:replace="~{fragments/owner-sidebar :: owner-sidebar('orders')}"></div>
+
+        <!-- Main Content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-3 mb-4 border-bottom">
+                <div>
+                    <h2 class="h3 fw-bold mb-0">Restaurant Orders 📦</h2>
+                    <p class="text-muted mb-0 fs-sm">Track real-time customer orders, accept orders, and update kitchen fulfillment statuses.</p>
+                </div>
+            </div>
+
+            <!-- Alerts -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show rounded-3 mb-4" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i><span th:text="${success}">Success</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show rounded-3 mb-4" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${error}">Error</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Filter status buttons -->
+            <div class="d-flex gap-2 mb-4 flex-wrap">
+                <a th:href="@{/owner/orders(status='ALL')}" th:classappend="${currentStatus == 'ALL'} ? 'btn-purple' : 'btn-light border'" class="btn rounded-pill px-3 py-1.5 fw-semibold fs-sm">All Orders</a>
+                <a th:href="@{/owner/orders(status='PLACED')}" th:classappend="${currentStatus == 'PLACED'} ? 'btn-purple' : 'btn-light border'" class="btn rounded-pill px-3 py-1.5 fw-semibold fs-sm">New (Placed)</a>
+                <a th:href="@{/owner/orders(status='CONFIRMED')}" th:classappend="${currentStatus == 'CONFIRMED'} ? 'btn-purple' : 'btn-light border'" class="btn rounded-pill px-3 py-1.5 fw-semibold fs-sm">Confirmed</a>
+                <a th:href="@{/owner/orders(status='PREPARING')}" th:classappend="${currentStatus == 'PREPARING'} ? 'btn-purple' : 'btn-light border'" class="btn rounded-pill px-3 py-1.5 fw-semibold fs-sm">Preparing</a>
+                <a th:href="@{/owner/orders(status='OUT_FOR_DELIVERY')}" th:classappend="${currentStatus == 'OUT_FOR_DELIVERY'} ? 'btn-purple' : 'btn-light border'" class="btn rounded-pill px-3 py-1.5 fw-semibold fs-sm">Out for Delivery</a>
+                <a th:href="@{/owner/orders(status='DELIVERED')}" th:classappend="${currentStatus == 'DELIVERED'} ? 'btn-purple' : 'btn-light border'" class="btn rounded-pill px-3 py-1.5 fw-semibold fs-sm">Delivered</a>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0 table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4">Order #</th>
+                                    <th>Customer</th>
+                                    <th>Restaurant</th>
+                                    <th>Items</th>
+                                    <th>Total Amount</th>
+                                    <th>Order Status</th>
+                                    <th class="pe-4 text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:if="${#lists.isEmpty(orders)}">
+                                    <td colspan="7" class="text-center py-5 text-muted">
+                                        <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary"></i>
+                                        No orders found matching status filter.
+                                    </td>
+                                </tr>
+                                <tr th:each="o : ${orders}">
+                                    <td class="ps-4 py-3 fw-bold text-purple" th:text="${o.orderNumber}">#ORD-101</td>
+                                    <td>
+                                        <div class="fw-semibold" th:text="${o.user.name}">Customer Name</div>
+                                        <small class="text-muted" th:text="${o.user.phone}">Phone</small>
+                                    </td>
+                                    <td class="fw-semibold" th:text="${o.restaurant.name}">Restaurant</td>
+                                    <td th:text="${#lists.size(o.items)} + ' items'">3 items</td>
+                                    <td class="fw-bold text-success" th:text="'₹' + ${o.grandTotal}">₹350.00</td>
+                                    <td>
+                                        <span th:classappend="${o.orderStatus.name() == 'DELIVERED'} ? 'bg-success' : (${o.orderStatus.name() == 'CANCELLED'} ? 'bg-danger' : 'bg-warning text-dark')"
+                                              class="badge rounded-pill px-3 py-1.5 fw-bold" th:text="${o.orderStatus}">PLACED</span>
+                                    </td>
+                                    <td class="pe-4 text-end">
+                                        <a th:href="@{/owner/orders/{id}(id=${o.id})}" class="btn btn-sm btn-purple rounded-pill px-3">
+                                            Manage Order <i class="bi bi-arrow-right ms-1"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

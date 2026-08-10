@@ -27,4 +27,19 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("SELECT SUM(o.grandTotal) FROM Order o WHERE o.orderStatus <> 'CANCELLED'")
     BigDecimal sumTotalRevenue();
+
+    List<Order> findByRestaurantOwnerOrderByCreatedAtDesc(User owner);
+
+    Optional<Order> findByIdAndRestaurantOwner(Long id, User owner);
+
+    List<Order> findByRestaurantOwnerAndOrderStatusOrderByCreatedAtDesc(User owner, Order.OrderStatus status);
+
+    long countByRestaurantOwner(User owner);
+
+    long countByRestaurantOwnerAndOrderStatus(User owner, Order.OrderStatus status);
+
+    long countByRestaurantOwnerAndCreatedAtAfter(User owner, LocalDateTime dateTime);
+
+    @Query("SELECT SUM(o.grandTotal) FROM Order o WHERE o.restaurant.owner = :owner AND o.createdAt >= :dateTime AND o.orderStatus <> 'CANCELLED'")
+    BigDecimal sumGrandTotalByOwnerAndCreatedAtAfter(@org.springframework.data.repository.query.Param("owner") User owner, @org.springframework.data.repository.query.Param("dateTime") LocalDateTime dateTime);
 }

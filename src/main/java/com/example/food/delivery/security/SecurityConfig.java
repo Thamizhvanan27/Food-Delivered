@@ -19,6 +19,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
+    private final CustomAuthenticationSuccessHandler customSuccessHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -41,22 +42,23 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(AbstractHttpConfigurer::disable) // Enabled forms can use custom or simple tokens, disabled for local ease
-            .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin())) // For H2 console
+            .csrf(AbstractHttpConfigurer::disable)
+            .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/", "/home", "/restaurants/**", "/search/**", "/offers",
-                    "/register", "/login", "/css/**", "/js/**", "/images/**",
+                    "/register", "/owner/register", "/login", "/css/**", "/js/**", "/images/**",
                     "/h2-console/**", "/error"
                 ).permitAll()
+                .requestMatchers("/owner/**").hasAnyAuthority("ROLE_RESTAURANT_OWNER", "ROLE_ADMIN")
                 .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
-                .requestMatchers("/cart/**", "/checkout/**", "/orders/**", "/profile/**", "/addresses/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_ADMIN")
+                .requestMatchers("/cart/**", "/checkout/**", "/orders/**", "/profile/**", "/addresses/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_ADMIN", "ROLE_RESTAURANT_OWNER")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
                 .loginPage("/login")
                 .loginProcessingUrl("/login")
-                .defaultSuccessUrl("/", true)
+                .successHandler(customSuccessHandler)
                 .failureUrl("/login?error=true")
                 .permitAll()
             )

@@ -38,6 +38,10 @@ public class CartService {
             throw new IllegalArgumentException("Selected item is currently unavailable");
         }
 
+        if (!foodItem.getRestaurant().isCurrentlyOpen()) {
+            throw new IllegalStateException("Sorry, " + foodItem.getRestaurant().getName() + " is currently closed and not accepting new orders.");
+        }
+
         Cart cart = getOrCreateCart(user);
 
         // Check if cart has items from another restaurant

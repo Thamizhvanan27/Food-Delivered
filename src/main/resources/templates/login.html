@@ -55,11 +55,15 @@
                     <div class="p-3 bg-light rounded-3 small text-muted mb-3 border">
                         <div class="fw-bold text-dark mb-1"><i class="bi bi-info-circle me-1 text-primary"></i>Demo Credentials</div>
                         <div><strong>Customer:</strong> <code>customer@foodexpress.com</code> / <code>user123</code></div>
+                        <div><strong>Partner Owner:</strong> <code>owner@foodexpress.com</code> / <code>owner123</code></div>
                         <div><strong>Admin:</strong> <code>admin@foodexpress.com</code> / <code>admin123</code></div>
                     </div>
 
-                    <div class="text-center text-muted small">
+                    <div class="text-center text-muted small mb-2">
                         Don't have an account yet? <a th:href="@{/register}" class="text-danger fw-bold text-decoration-none">Sign Up Now</a>
+                    </div>
+                    <div class="text-center text-muted small border-top pt-2">
+                        Own a restaurant? <a th:href="@{/owner/register}" class="text-purple fw-bold text-decoration-none">Register as Restaurant Partner</a>
                     </div>
                 </div>
 

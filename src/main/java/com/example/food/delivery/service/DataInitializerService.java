@@ -51,6 +51,15 @@ public class DataInitializerService implements CommandLineRunner {
                 .build();
         userRepository.save(customer);
 
+        User owner = User.builder()
+                .name("Rajesh Sharma (Partner Owner)")
+                .email("owner@foodexpress.com")
+                .password(passwordEncoder.encode("owner123"))
+                .phone("+91 9876543212")
+                .role("ROLE_RESTAURANT_OWNER")
+                .build();
+        userRepository.save(owner);
+
         // 2. Default Address
         Address defaultAddr = Address.builder()
                 .user(customer)
@@ -78,6 +87,7 @@ public class DataInitializerService implements CommandLineRunner {
 
         // 4. Restaurants
         Restaurant r1 = restaurantRepository.save(Restaurant.builder()
+                .owner(owner)
                 .name("Spice Garden")
                 .description("Authentic Indian Mughlai & Tandoori Delicacies")
                 .cuisine("North Indian, Biryani, Mughlai")
@@ -88,9 +98,11 @@ public class DataInitializerService implements CommandLineRunner {
                 .priceRange("₹350 for two")
                 .imageUrl("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600")
                 .active(true)
+                .operationalStatus(Restaurant.OperationalStatus.OPEN)
                 .build());
 
         Restaurant r2 = restaurantRepository.save(Restaurant.builder()
+                .owner(owner)
                 .name("Burger Hub")
                 .description("Gourmet Artisan Burgers & Loaded Fries")
                 .cuisine("American, Burgers, Fast Food")

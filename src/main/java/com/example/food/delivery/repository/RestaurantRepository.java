@@ -19,4 +19,12 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
     List<Restaurant> searchRestaurants(@Param("query") String query);
 
     List<Restaurant> findByActiveTrueOrderByRatingDesc();
+
+    List<Restaurant> findByOwner(com.example.food.delivery.entity.User owner);
+
+    java.util.Optional<Restaurant> findByIdAndOwner(Long id, com.example.food.delivery.entity.User owner);
+
+    List<Restaurant> findByOwnerId(Long ownerId);
+
+    long countByOwner(com.example.food.delivery.entity.User owner);
 }

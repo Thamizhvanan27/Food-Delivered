@@ -35,6 +35,27 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    @Transactional
+    public User registerOwner(com.example.food.delivery.dto.OwnerRegisterDto dto) {
+        if (!dto.getPassword().equals(dto.getConfirmPassword())) {
+            throw new IllegalArgumentException("Passwords do not match!");
+        }
+
+        if (userRepository.existsByEmail(dto.getEmail())) {
+            throw new IllegalArgumentException("Email already registered: " + dto.getEmail());
+        }
+
+        User user = User.builder()
+                .name(dto.getName())
+                .email(dto.getEmail())
+                .password(passwordEncoder.encode(dto.getPassword()))
+                .phone(dto.getPhone())
+                .role("ROLE_RESTAURANT_OWNER")
+                .build();
+
+        return userRepository.save(user);
+    }
+
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
     }

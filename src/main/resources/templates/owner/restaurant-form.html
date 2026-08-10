@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${isEdit} ? 'Edit Restaurant | Partner Portal' : 'Register Restaurant | Partner Portal'">Register Restaurant</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="bg-light">
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div th:replace="~{fragments/owner-sidebar :: owner-sidebar(${isEdit} ? 'restaurants' : 'register-restaurant')}"></div>
+
+        <!-- Main Content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+
+            <div class="d-flex justify-content-between align-items-center pb-3 mb-4 border-bottom">
+                <div>
+                    <h2 class="h3 fw-bold mb-0" th:text="${isEdit} ? 'Edit Restaurant Details' : 'Register Your Restaurant'">Register Restaurant</h2>
+                    <p class="text-muted mb-0 fs-sm">Fill in your restaurant address, business hours, and operational details.</p>
+                </div>
+                <a th:href="@{/owner/restaurants}" class="btn btn-outline-secondary rounded-pill">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Restaurants
+                </a>
+            </div>
+
+            <!-- Validation alert -->
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show rounded-3 mb-4" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${error}">Error</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4 p-md-5">
+
+                    <form th:action="@{/owner/restaurants/save}" th:object="${restaurantDto}" method="post">
+                        <input type="hidden" th:field="*{id}">
+
+                        <h5 class="fw-bold mb-3 text-purple"><i class="bi bi-info-circle me-2"></i>Basic Restaurant Information</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Restaurant Name <span class="text-danger">*</span></label>
+                                <input type="text" th:field="*{name}" class="form-control" placeholder="e.g. Spice Garden" required>
+                                <div class="text-danger fs-xs mt-1" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Cuisine Types <span class="text-danger">*</span></label>
+                                <input type="text" th:field="*{cuisine}" class="form-control" placeholder="e.g. North Indian, Biryani, Fast Food" required>
+                                <div class="text-danger fs-xs mt-1" th:if="${#fields.hasErrors('cuisine')}" th:errors="*{cuisine}"></div>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Short Description</label>
+                                <textarea th:field="*{description}" class="form-control" rows="2" placeholder="Brief tagline or specialty details..."></textarea>
+                            </div>
+                        </div>
+
+                        <h5 class="fw-bold mb-3 text-purple"><i class="bi bi-geo-alt me-2"></i>Location & Address</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Street Address <span class="text-danger">*</span></label>
+                                <input type="text" th:field="*{address}" class="form-control" placeholder="Door No, Street Name, Area" required>
+                                <div class="text-danger fs-xs mt-1" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">City <span class="text-danger">*</span></label>
+                                <input type="text" th:field="*{city}" class="form-control" placeholder="e.g. Bengaluru" required>
+                                <div class="text-danger fs-xs mt-1" th:if="${#fields.hasErrors('city')}" th:errors="*{city}"></div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">State</label>
+                                <input type="text" th:field="*{state}" class="form-control" placeholder="e.g. Karnataka">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Pincode</label>
+                                <input type="text" th:field="*{pincode}" class="form-control" placeholder="e.g. 560038">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Landmark</label>
+                                <input type="text" th:field="*{landmark}" class="form-control" placeholder="e.g. Opposite Metro Station">
+                            </div>
+                        </div>
+
+                        <h5 class="fw-bold mb-3 text-purple"><i class="bi bi-telephone-option me-2"></i>Contact & Hours</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Restaurant Phone <span class="text-danger">*</span></label>
+                                <input type="tel" th:field="*{phone}" class="form-control" placeholder="+91 9876543210" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Restaurant Email</label>
+                                <input type="email" th:field="*{email}" class="form-control" placeholder="contact@restaurant.com">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Opening Time</label>
+                                <input type="time" th:field="*{openingTime}" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Closing Time</label>
+                                <input type="time" th:field="*{closingTime}" class="form-control">
+                            </div>
+                        </div>
+
+                        <h5 class="fw-bold mb-3 text-purple"><i class="bi bi-sliders me-2"></i>Pricing & Media</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Price Range</label>
+                                <input type="text" th:field="*{priceRange}" class="form-control" placeholder="e.g. ₹350 for two">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Avg. Delivery Time (Mins)</label>
+                                <input type="number" th:field="*{deliveryTimeMinutes}" class="form-control" placeholder="30">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Image URL</label>
+                                <input type="url" th:field="*{imageUrl}" class="form-control" placeholder="https://images.unsplash.com/...">
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-3 border-top pt-4">
+                            <a th:href="@{/owner/restaurants}" class="btn btn-light border px-4 rounded-pill">Cancel</a>
+                            <button type="submit" class="btn btn-purple px-5 rounded-pill fw-bold shadow-sm">
+                                <i class="bi bi-check-lg me-1"></i> Save Restaurant
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
