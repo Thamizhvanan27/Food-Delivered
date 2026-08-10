@@ -28,8 +28,29 @@ public class DataInitializerService implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        if (userRepository.count() > 0) {
-            return; // Data already initialized
+        // Always ensure sample partner owner account exists
+        if (!userRepository.existsByEmail("owner@foodexpress.com")) {
+            User owner = User.builder()
+                    .name("Rajesh Sharma (Partner Owner)")
+                    .email("owner@foodexpress.com")
+                    .password(passwordEncoder.encode("owner123"))
+                    .phone("+91 9876543212")
+                    .role("ROLE_RESTAURANT_OWNER")
+                    .build();
+            userRepository.save(owner);
+
+            // Link any existing unassigned restaurants to this sample owner
+            List<Restaurant> restaurants = restaurantRepository.findAll();
+            for (Restaurant r : restaurants) {
+                if (r.getOwner() == null) {
+                    r.setOwner(owner);
+                    restaurantRepository.save(r);
+                }
+            }
+        }
+
+        if (userRepository.count() > 1) {
+            return; // Full data already initialized
         }
 
         // 1. Users
