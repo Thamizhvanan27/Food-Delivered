@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Food Form - Admin | FoodExpress</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+
+    <div class="admin-wrapper">
+        <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+        <div class="admin-content">
+            <h3 class="fw-bold mb-4" th:text="${foodItem.id != null ? 'Edit Food Item' : 'Create New Food Item'}">Food Item Form</h3>
+
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <form th:action="@{/admin/food/save}" method="post" th:object="${foodItem}">
+                    <input type="hidden" th:field="*{id}">
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Item Name *</label>
+                            <input type="text" th:field="*{name}" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Price (₹) *</label>
+                            <input type="number" step="0.01" th:field="*{price}" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Restaurant *</label>
+                            <select th:field="*{restaurant.id}" class="form-select" required>
+                                <option value="">Select Restaurant</option>
+                                <option th:each="r : ${restaurants}" th:value="${r.id}" th:text="${r.name}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Category</label>
+                            <select th:field="*{category.id}" class="form-select">
+                                <option value="">Select Category</option>
+                                <option th:each="c : ${categories}" th:value="${c.id}" th:text="${c.name}"></option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Image URL</label>
+                            <input type="url" th:field="*{imageUrl}" class="form-control" placeholder="https://images.unsplash.com/...">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Description</label>
+                            <textarea th:field="*{description}" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" th:field="*{vegetarian}" id="vegCheck">
+                                <label class="form-check-label" for="vegCheck">Is Vegetarian</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" th:field="*{available}" id="availCheck">
+                                <label class="form-check-label" for="availCheck">Available for Order</label>
+                            </div>
+                        </div>
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-primary-food">Save Food Item</button>
+                            <a th:href="@{/admin/food}" class="btn btn-light ms-2">Cancel</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

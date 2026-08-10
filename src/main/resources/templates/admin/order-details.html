@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Order Details | FoodExpress</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+
+    <div class="admin-wrapper">
+        <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+        <div class="admin-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h3 class="fw-bold mb-1">Order Details</h3>
+                    <p class="text-muted mb-0">Order ID: <span class="fw-bold text-dark" th:text="${order.orderNumber}">ORD-1234</span></p>
+                </div>
+                <a th:href="@{/admin/orders}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left me-1"></i>Back to Orders List</a>
+            </div>
+
+            <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+            <!-- Status Updater Box -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-light">
+                <form th:action="@{/admin/orders/{id}/status(id=${order.id})}" method="post" class="row g-3 align-items-center">
+                    <div class="col-auto">
+                        <label class="fw-bold text-dark mb-0">Current Status:</label>
+                    </div>
+                    <div class="col-auto">
+                        <select name="status" class="form-select fw-bold">
+                            <option th:each="st : ${statuses}" th:value="${st.name()}" th:text="${st.name()}" th:selected="${order.orderStatus == st}"></option>
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary-food"><i class="bi bi-check2-circle me-1"></i>Update Order Status</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-8">
+                    <!-- Customer & Restaurant details -->
+                    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                        <div class="row g-3">
+                            <div class="col-md-6 border-end">
+                                <h6 class="text-muted fw-bold mb-2">CUSTOMER DETAILS</h6>
+                                <p class="fw-bold mb-1" th:text="${order.user.name}">John Doe</p>
+                                <p class="text-secondary small mb-1" th:text="${order.user.email}">john@example.com</p>
+                                <p class="text-secondary small mb-0" th:text="${order.user.phone}">Phone</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-muted fw-bold mb-2">DELIVERY ADDRESS</h6>
+                                <p class="fw-bold mb-1" th:text="${order.deliveryAddress.fullName}">Recipient Name</p>
+                                <p class="text-secondary small mb-1" th:text="${order.deliveryAddress.houseNo + ', ' + order.deliveryAddress.addressLine + ', ' + order.deliveryAddress.city + ' - ' + order.deliveryAddress.pincode}">Address</p>
+                                <p class="text-secondary small mb-0"><i class="bi bi-telephone me-1"></i><span th:text="${order.deliveryAddress.phone}">Phone</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ordered items list -->
+                    <div class="card border-0 shadow-sm rounded-4 p-4">
+                        <h6 class="fw-bold mb-3" th:text="${'Items from ' + order.restaurant.name}">Restaurant Items</h6>
+                        <table class="table align-middle">
+                            <thead>
+                                <tr class="text-muted small">
+                                    <th>Dish</th>
+                                    <th>Price</th>
+                                    <th>Qty</th>
+                                    <th class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="item : ${order.items}">
+                                    <td class="fw-bold" th:text="${item.foodName}">Dish Name</td>
+                                    <td>₹<span th:text="${item.price}">100.00</span></td>
+                                    <td th:text="${item.quantity}">1</td>
+                                    <td class="text-end fw-bold">₹<span th:text="${item.price * item.quantity}">100.00</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm rounded-4 p-4">
+                        <h6 class="fw-bold mb-3">Bill Breakdown</h6>
+
+                        <div class="d-flex justify-content-between small mb-2">
+                            <span class="text-muted">Subtotal</span>
+                            <span class="fw-semibold">₹<span th:text="${order.subtotal}">0.00</span></span>
+                        </div>
+                        <div class="d-flex justify-content-between small mb-2">
+                            <span class="text-muted">Delivery Charge</span>
+                            <span class="fw-semibold">₹<span th:text="${order.deliveryFee}">40.00</span></span>
+                        </div>
+                        <div class="d-flex justify-content-between small mb-2">
+                            <span class="text-muted">Taxes</span>
+                            <span class="fw-semibold">₹<span th:text="${order.tax}">0.00</span></span>
+                        </div>
+                        <div th:if="${order.discountAmount != null && order.discountAmount > 0}" class="d-flex justify-content-between small mb-2 text-success">
+                            <span>Discount</span>
+                            <span class="fw-bold">- ₹<span th:text="${order.discountAmount}">0.00</span></span>
+                        </div>
+
+                        <hr class="my-3">
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Grand Total</span>
+                            <span class="fw-bold fs-5 text-danger">₹<span th:text="${order.grandTotal}">0.00</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>
