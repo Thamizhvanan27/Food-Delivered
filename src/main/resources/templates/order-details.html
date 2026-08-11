@@ -117,7 +117,15 @@
                         </div>
                         <div class="d-flex justify-content-between small mb-2">
                             <span class="text-muted">Payment Status</span>
-                            <span class="badge bg-secondary" th:text="${order.paymentStatus}">PENDING</span>
+                            <div>
+                                <span th:if="${order.paymentStatus.name() == 'PAID'}" class="badge bg-success"><i class="bi bi-check-circle me-1"></i>PAID</span>
+                                <span th:if="${order.paymentStatus.name() == 'PENDING'}" class="badge bg-warning text-dark"><i class="bi bi-clock me-1"></i>PENDING</span>
+                                <span th:if="${order.paymentStatus.name() == 'FAILED'}" class="badge bg-danger"><i class="bi bi-exclamation-triangle me-1"></i>FAILED</span>
+                            </div>
+                        </div>
+                        <div th:if="${order.stripePaymentIntentId != null}" class="d-flex justify-content-between small mb-2 text-muted">
+                            <span>Transaction Ref</span>
+                            <span class="font-monospace small" th:text="${order.stripePaymentIntentId}">pi_12345</span>
                         </div>
 
                         <hr class="my-3">
@@ -145,6 +153,13 @@
                             <span class="fw-bold fs-5">Total Paid</span>
                             <span class="fw-bold fs-4 text-danger">₹<span th:text="${order.grandTotal}">0.00</span></span>
                         </div>
+
+                        <!-- Pay Now button if online payment is pending/failed -->
+                        <form th:if="${order.paymentMethod.name() == 'ONLINE' && order.paymentStatus.name() != 'PAID' && order.orderStatus.name() != 'CANCELLED'}" th:action="@{/orders/{id}/pay(id=${order.id})}" method="post" class="mb-2">
+                            <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">
+                                <i class="bi bi-credit-card-fill me-1"></i>PAY NOW WITH STRIPE
+                            </button>
+                        </form>
 
                         <!-- Cancel Button (if order status allows) -->
                         <form th:if="${order.orderStatus.name() == 'PLACED' || order.orderStatus.name() == 'CONFIRMED'}" th:action="@{/orders/{id}/cancel(id=${order.id})}" method="post">

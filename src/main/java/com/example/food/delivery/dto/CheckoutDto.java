@@ -10,7 +10,7 @@ public class CheckoutDto {
     @NotNull(message = "Please select a delivery address")
     private Long addressId;
 
-    private Order.PaymentMethod paymentMethod = Order.PaymentMethod.CASH_ON_DELIVERY;
+    private Order.PaymentMethod paymentMethod = Order.PaymentMethod.ONLINE;
 
     private String couponCode;
 }

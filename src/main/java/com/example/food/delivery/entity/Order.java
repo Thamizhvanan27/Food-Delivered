@@ -66,6 +66,10 @@ public class Order {
 
     private String couponCode;
 
+    private String stripeSessionId;
+
+    private String stripePaymentIntentId;
+
     private LocalDateTime createdAt;
 
     @PrePersist

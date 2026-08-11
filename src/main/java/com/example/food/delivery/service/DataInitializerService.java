@@ -72,14 +72,14 @@ public class DataInitializerService implements CommandLineRunner {
                 .build();
         userRepository.save(customer);
 
-        User owner = User.builder()
-                .name("Rajesh Sharma (Partner Owner)")
-                .email("owner@foodexpress.com")
-                .password(passwordEncoder.encode("owner123"))
-                .phone("+91 9876543212")
-                .role("ROLE_RESTAURANT_OWNER")
-                .build();
-        userRepository.save(owner);
+        User owner = userRepository.findByEmail("owner@foodexpress.com")
+                .orElseGet(() -> userRepository.save(User.builder()
+                        .name("Rajesh Sharma (Partner Owner)")
+                        .email("owner@foodexpress.com")
+                        .password(passwordEncoder.encode("owner123"))
+                        .phone("+91 9876543212")
+                        .role("ROLE_RESTAURANT_OWNER")
+                        .build()));
 
         // 2. Default Address
         Address defaultAddr = Address.builder()

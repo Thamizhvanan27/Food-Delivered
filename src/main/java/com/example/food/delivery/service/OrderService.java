@@ -100,6 +100,23 @@ public class OrderService {
     }
 
     @Transactional
+    public void saveStripeSessionId(Long orderId, String stripeSessionId) {
+        Order order = getOrderByIdAdmin(orderId);
+        order.setStripeSessionId(stripeSessionId);
+        orderRepository.save(order);
+    }
+
+    @Transactional
+    public void updateStripePaymentDetails(Long orderId, String stripePaymentIntentId, Order.PaymentStatus status) {
+        Order order = getOrderByIdAdmin(orderId);
+        if (stripePaymentIntentId != null) {
+            order.setStripePaymentIntentId(stripePaymentIntentId);
+        }
+        order.setPaymentStatus(status);
+        orderRepository.save(order);
+    }
+
+    @Transactional
     public void updateOrderStatus(Long orderId, Order.OrderStatus status) {
         Order order = getOrderByIdAdmin(orderId);
         order.setOrderStatus(status);
